@@ -124,9 +124,9 @@ const SetGoalsForm = () => {
     {
       position: 5,
       formTitle:
-        "Great! We are almost there! Do you have any requirement on the ammount of protein that you want to eat daily?",
+        "Great! We are almost there. Just one last step!",
       label:
-        "If you say no we will choose a protein intake for you based on your goals.",
+        "Please specify how do you want to split your daily macronutrients intake. Recommended: 25% Protein, 55% Carbs, 20% Fat.",
       previous: 4,
       progress: 0.75,
       //Next: Yes -> 6 No-> 2
@@ -278,7 +278,6 @@ const SetGoalsForm = () => {
             variant={"ghost"}
             onClick={() => {
               setCurrentQuestion(formLogic[currentQuestion.previous]);
-              setProte(1);
             }
             }
           >
@@ -323,7 +322,7 @@ const SetGoalsForm = () => {
         ) : (
           <></>
         )}
-        {currentQuestion.position === 1 ? (
+        {currentQuestion.position === 1 || currentQuestion.position === 5 ? (
           //Introduce macros directly
           <div className="flex flex-col gap-4 w-full items-center">
             <div className="flex flex-row gap-2 items-center">
@@ -337,6 +336,7 @@ const SetGoalsForm = () => {
               />
               <p>calories/day</p>
             </div>
+            {Number(kcals) < 0 ? <p className="text-[red] text-sm">Please provide a positive value</p> : <></>}
             {/* PROTE */}
             <div className="flex flex-row gap-4 items-center">
               <p className="w-16">Protein:</p>
@@ -386,6 +386,7 @@ const SetGoalsForm = () => {
                   setCurrentQuestion(formLogic[2]);
                 }}
                 className="w-44"
+                disabled={(Number(kcals) > 0) ? false : true}
               >
                 Continue
             </Button>
@@ -586,64 +587,6 @@ const SetGoalsForm = () => {
         ) : (
           <></>
         )}
-        {currentQuestion.position === 5 ? (
-          <div className="flex flex-row justify-around gap-2">
-            <Button
-              className="w-32"
-              variant={"mainbutton"}
-              onClick={() => {
-                setCurrentQuestion(formLogic[7]);
-                setProte(1);
-              }}
-            >
-              Yes
-            </Button>
-            <Button
-              className="w-32"
-              variant={"mainbutton"}
-              onClick={() => 
-              {setCurrentQuestion(formLogic[6]);
-              setProte(Number(kcals)*0.25/4);
-              setFat(Number(kcals)*0.2/8);
-              setCarbs(Number(kcals)*0.55/4);
-              }}
-            >
-              No
-            </Button>
-          </div>
-        ) : (
-          <></>
-        )}
-        {currentQuestion.position === 7 ? (
-          <div className="flex flex-col gap-4 items-center">
-            <div className="flex flex-col md:flex-row gap-4 md:gap-2">
-              <p className="order-2 md:order-1 text-center md:text-start">
-                {Math.round(prote*10)/10} g of Protein/ kg
-              </p>
-              <Slider
-              onValueChange={(value) => {
-                setProte(value[0]);
-              }}
-                max={Math.round(Number(kcals)/(4)/weight*100)/100}
-                step={0.1}
-                value={[prote]}
-                className="order-1 md:order-2 w-[240px]"
-              />
-            </div>
-            <Button
-              className="w-44"
-              variant={"mainbutton"}
-              onClick={() => {
-                setCurrentQuestion(formLogic[8]);
-                handleProteInput();
-              }}
-            >
-              Continue
-            </Button>
-          </div>
-        ) : (
-          <></>
-        )}
         {currentQuestion.position === 2 ||
         currentQuestion.position === 6 ||
         currentQuestion.position === 8 ? (
@@ -652,13 +595,13 @@ const SetGoalsForm = () => {
               You will be eating {Math.round(Number(kcals))} cals per day.
             </p>
             <p className="text-center font-semibold text-lg">
-              {Math.round(prote*1)/1} grams of protein per day. ({Math.round(prote/Number(kcals)*4*100)}%)
+              {Math.round(Number(kcals)*prote/4)} grams of protein per day. ({Math.round(prote*100)}%)
             </p>
             <p className="text-center font-semibold text-lg">
-              {Math.round(carbs*1)/1} grams of Carbohydrates per day. ({Math.round(carbs/Number(kcals)*4*100)}%)
+            {Math.round(Number(kcals)*carbs/4)} grams of Carbohydrates per day. ({Math.round(carbs*100)}%)
             </p>
             <p className="text-center font-semibold text-lg">
-              {Math.round(fat*1)/1} grams of fat per day. ({Math.round(fat/Number(kcals)*8*100)}%)
+            {Math.round(Number(kcals)*fat/8)} grams of fat per day. ({Math.round(fat*100)}%)
             </p>
             {/* TODO: Add some Graphs with the values. */}
             <p className="text-center">

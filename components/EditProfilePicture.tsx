@@ -56,7 +56,6 @@ const EditProfilePicture = (params: EditPFPProps) => {
         path: result,
       };
 
-      console.log(result);
       try {
           await axios.patch(
             `/api/profilepicture/${params.user_id}}`,
