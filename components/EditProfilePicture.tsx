@@ -9,6 +9,7 @@ import { ChangeEvent, useState } from "react";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { Loader2Icon, RocketIcon } from "lucide-react";
 
 interface EditPFPProps {
   originalPicture: string | null;
@@ -45,22 +46,29 @@ const EditProfilePicture = (params: EditPFPProps) => {
       return null;
     }
 
-    console.log(params.originalPicture);
     if (params.originalPicture) {
       let index = params.originalPicture.indexOf("profile_pictures");
       var result = params.originalPicture.substring(index + "profile_pictures".length +1);
       result = "/" + result;
-      console.log(result);
-      var values = {
-        image: selectedImage,
-        path: result,
-      };
-
+      const formData = new FormData();
+      if (selectedImage !== null) {
+        formData.append('image', selectedImage);
+      } else {
+        toast.error("The picture selected is currently not supported.", {
+          id: "missingPictureBeforeAPICall",
+        });
+        setIsLoading(false);
+        return null;
+      }
+      formData.append('path', result);
       try {
           await axios.patch(
-            `/api/profilepicture/${params.user_id}}`,
-            values
-          );
+            `/api/profilepicture/${params.user_id}}`, formData, {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+              data: formData, // Use the data option to specify the request body
+            });
         toast.success("Profile picture updated succesfully", {
           id: "profileUpadte",
         });
@@ -71,6 +79,8 @@ const EditProfilePicture = (params: EditPFPProps) => {
         setIsLoading(false);
       }
       setIsLoading(false);
+      setSelectedImage(null);
+      setImageUrl(null);
       router.refresh();
     }
     //TODO: Check if the username already exists?
@@ -105,21 +115,27 @@ const EditProfilePicture = (params: EditPFPProps) => {
         <></>
       )}
       {params.originalPicture ? (
-        <Button variant={"secondary"} className="relative">
+        <Button variant={"secondary"} className="relative" disabled={isLoading}>
           Change Picture
           <input
             type="file"
             accept="image/*"
             onChange={handleImageChange}
+            disabled={isLoading}
             className="absolute w-full h-full opacity-0"
           />
         </Button>
       ) : (
-        <Button>Add a picture</Button>
+        <Button disabled={isLoading}>Add a picture</Button>
       )}
       {selectedImage && imageUrl ? (
-        <Button variant={"mainbutton"} onClick={handleSubmit}>
+        <Button variant={"mainbutton"} onClick={handleSubmit} disabled={isLoading}>
           Save changes
+          {isLoading ? 
+          <Loader2Icon className="animate-spin w-4 h-4 ml-2" />
+          :
+          <></>
+          }
         </Button>
       ) : (
         <></>

@@ -53,6 +53,7 @@ interface SettingsPageProps {
 
   const SettingsPage = async ({ params }: SettingsPageProps) => {
 
+    const relative = 0;
     const {data} = await readUserSession();
     if (!data.session) {
       return redirect("/");

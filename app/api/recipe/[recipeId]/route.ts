@@ -5,8 +5,9 @@ import { userProfileDetails } from "@/types";
 import { NextResponse } from "next/server";
 import uniqid from "uniqid";
 
-export async function POST(
+export async function PATCH(
     req: Request,
+    { params }: { params: { recipeId: string } }
   ) {
     try {
         
@@ -22,13 +23,15 @@ export async function POST(
     data.session.user.id
   );
   
+    //Check if the user id is the same as the one that created the recipe!
+  
       const info = await req.formData();
       const recipeId = String(info.get('recipeId'));
       const recipeName = info.get('recipeName');
       const briefDescription = info.get('briefDescription');
       const difficulty = info.get('difficulty');
       const time = info.get('time');
-      const oldImage = info.get('oldImage');
+      const oldImage = String(info.get('oldImage'));
       const imageFile = info.get('imageFile');
       const kcals = Number(info.get('kcals'));
       const prote = Number(info.get('prote'));

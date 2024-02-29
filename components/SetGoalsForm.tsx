@@ -165,6 +165,7 @@ const SetGoalsForm = () => {
   const [fat, setFat] = useState(0.2);
   const [carbs, setCarbs] = useState(0.55);
   const [weight, setWeight] = useState(1);
+  const [unvalidKcals, setUnvalidKcals] = useState(false);
 
   const calculatorForm = useForm<z.infer<typeof calculatorFormSchema>>({
     resolver: zodResolver(calculatorFormSchema),
@@ -250,20 +251,6 @@ const SetGoalsForm = () => {
       }
     }
   }
-  
-  const handleProteInput = () => {
-    const newProte = prote;
-    setProte(newProte*weight);
-    const remaining = Number(kcals) - prote * 4;
-    const neededFats = Number(kcals) * 0.2;
-    if (neededFats <= remaining) {
-      setFat(neededFats/8);
-      setCarbs((remaining-neededFats)/4);
-    } else {
-      setFat(remaining/8);
-      setCarbs(0);
-    }
-  }
 
   return (
     <div className="flex flex-col h-full justify-start items-center">
@@ -332,11 +319,11 @@ const SetGoalsForm = () => {
                 placeholder="2500"
                 className="text-center w-32"
                 value={kcals !== "" ? String(Math.round(Number(kcals)*100)/100) : ""}
-                onChange={(e) => {setKcals(e.target.value)}}
+                onChange={(e) => {setKcals(e.target.value); setUnvalidKcals(false);}}
               />
               <p>calories/day</p>
             </div>
-            {Number(kcals) < 0 ? <p className="text-[red] text-sm">Please provide a positive value</p> : <></>}
+            {Number(kcals) < 0 || unvalidKcals ? <p className="text-[red] text-sm">Please provide a positive value</p> : <></>}
             {/* PROTE */}
             <div className="flex flex-row gap-4 items-center">
               <p className="w-16">Protein:</p>
@@ -383,10 +370,13 @@ const SetGoalsForm = () => {
             <Button
                 variant={"mainbutton"}
                 onClick={() => {
+                  if (Number(kcals) > 0) {
                   setCurrentQuestion(formLogic[2]);
-                }}
+                } else {
+                  setUnvalidKcals(true);
+                }
+              }}
                 className="w-44"
-                disabled={(Number(kcals) > 0) ? false : true}
               >
                 Continue
             </Button>

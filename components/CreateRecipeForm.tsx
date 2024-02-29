@@ -8,7 +8,14 @@ import {
 } from "@/types";
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
-import { BarChartIcon, Loader2Icon, RocketIcon, Router, TimerIcon, XIcon } from "lucide-react";
+import {
+  BarChartIcon,
+  Loader2Icon,
+  RocketIcon,
+  Router,
+  TimerIcon,
+  XIcon,
+} from "lucide-react";
 import { Separator } from "@radix-ui/react-dropdown-menu";
 import { Textarea } from "./ui/textarea";
 import {
@@ -23,13 +30,12 @@ import RecipeMacros from "./RecipeMacros";
 import DrawerAddElement from "./DrawerAddElement";
 import toast from "react-hot-toast";
 import uniqid from "uniqid";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import Image from "next/image";
 import createSupabaseClientClient from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import {useLoadFoodImage} from "@/actions/recipes/get/actions";
+import { useLoadFoodImage } from "@/actions/recipes/get/actions";
 import axios from "axios";
-
 
 //Ingredient and quantities:
 interface CreateRecipeFormProps {
@@ -45,7 +51,6 @@ const CreateRecipeForm = ({
   OriginalRecipeIngAndQuant,
 }: //categories,
 CreateRecipeFormProps) => {
-
   const router = useRouter();
   const supabase = createSupabaseClientClient();
 
@@ -210,21 +215,17 @@ CreateRecipeFormProps) => {
       typeError = true;
     }
     if (!difficulty) {
-
-
       setValidatedDifficulty("Please assign a difficulty to your recipe");
       typeError = true;
     }
     //This doesn't work yet
-    if (time === undefined) {
-
+    if (!time) {
       setValidatedTime(
         "Please specify how long does your recipe take to prepare"
       );
       typeError = true;
     }
     if (!briefDescription) {
-
       setValidatedBriefDescription(
         "Please give your recipe a brief description"
       );
@@ -237,7 +238,6 @@ CreateRecipeFormProps) => {
       typeError = true;
     }
     if (steps.length === 0) {
-      
       setValidatedSteps(
         "Please add instructions on how to elaborate your recipe"
       );
@@ -248,7 +248,6 @@ CreateRecipeFormProps) => {
         setValidatedSteps("Please do not leavy any recipe step empty.");
         typeError = true;
       }
-
     }
     if (
       !exportedIngAndQuantArray ||
@@ -262,9 +261,7 @@ CreateRecipeFormProps) => {
     }
     //This doesnt work because of the nature of the async state, the value gets validated after the if is accomplished,
     //thus the function keeps executing!
-    if (
-      typeError === true
-    ) {
+    if (typeError === true) {
       toast.error("Please fill in the required fields", {
         id: "missingFields",
       });
@@ -272,91 +269,77 @@ CreateRecipeFormProps) => {
       return null;
     }
 
-    console.log("all types checked correctly");
-    const uniqueID = uniqid();
+    const uuid4: string = uuidv4();
 
+    const formData = new FormData();
     if (exportedIngAndQuantArray) {
-      const values: UploadRecipeProps = {
-        recipeId: originalRecipe?.recipeId || uniqueID,
-        recipeName: recipeName,
-        briefDescription: briefDescription,
-        difficulty: difficulty,
-        time: time,
-        imagePath: oldImage,
-        imageFile: newImage,
-        kcals: exportedIngAndQuantArray.kcals,
-        prote: exportedIngAndQuantArray.prote,
-        carbs: exportedIngAndQuantArray.carbs,
-        sugar: exportedIngAndQuantArray.sugar,
-        fat: exportedIngAndQuantArray.fat,
-        saturatedFat: exportedIngAndQuantArray.saturatedFat,
-        salt: exportedIngAndQuantArray.salt,
-        fiber: exportedIngAndQuantArray.fiber,
-        steps: steps,
-        ingAndQuant: exportedIngAndQuantArray.ingAndQuant,
-        nOfIngredients: exportedIngAndQuantArray.ingAndQuant.length,
-        author_username: "FullFoods",
-      };
-
-      if (values.imageFile) {
-                  //Upload image
-                  const {
-                    data: imageData,
-                    error: imageError,
-    
-                } = await supabase.storage.from("images").upload(`image-${uniqueID}`, values.imageFile, {cacheControl:"3600", upsert: false});
-    
-                if (imageError){
-                    setIsLoading(false);
-                    return toast.error("Failed thumbnail upload");
-                }
-              }
-      const uuid4: string = uuidv4();
-      console.log(uuid4);
-      const {error: recipeError} = await supabase.from("recipes").insert({
-        recipeId: uuid4,
-        recipeName: recipeName,
-        briefDescription: briefDescription,
-        difficulty: difficulty,
-        time: time,
-        image: `image-${uniqueID}`,
-        //imageFile: newImage,
-        kcals: exportedIngAndQuantArray.kcals,
-        prote: exportedIngAndQuantArray.prote,
-        carbs: exportedIngAndQuantArray.carbs,
-        sugar: exportedIngAndQuantArray.sugar,
-        fat: exportedIngAndQuantArray.fat,
-        saturatedFat: exportedIngAndQuantArray.saturatedFat,
-        salt: exportedIngAndQuantArray.salt,
-        fiber: exportedIngAndQuantArray.fiber,
-        steps: steps,
-        //ingAndQuant: exportedIngAndQuantArray.ingAndQuant,
-        nOfIngredients: exportedIngAndQuantArray.ingAndQuant.length,
-        author_username: "FullFoods",
-      });
-
-      if (recipeError) {
-        toast.error(recipeError.message);
+      formData.append("recipeId", originalRecipe?.recipeId || uuid4);
+      formData.append("recipeName", recipeName);
+      formData.append("briefDescription", briefDescription);
+      formData.append("difficulty", difficulty);
+      formData.append("time", time);
+      if (oldImage) {
+        formData.append("imagePath", oldImage);
       } else {
-        for (let i = 0; i < values.ingAndQuant.length; i++) {
-          const {error} = await supabase.from("ingredientsToRecipes").insert({
-            recipeId: uuid4,
-            ingredientId: values.ingAndQuant[i][0],
-            quantity: values.ingAndQuant[i][1],
-          });
-          if (error){
-            return toast.error("Failed to upload the ingredients");
-          };
-        };
-        
-
-        toast.success("Recipe uploaded succesfully");
-        router.push("/recipe/"+uuid4);
+        formData.append("imagePath", "");
       }
-      setIsLoading(false);
+      if (newImage) {
+        formData.append("imageFile", newImage);
+      }
+      formData.append("kcals", exportedIngAndQuantArray.kcals.toString());
+      formData.append("prote", exportedIngAndQuantArray.prote.toString());
+      formData.append("carbs", exportedIngAndQuantArray.carbs.toString());
+      formData.append("fat", exportedIngAndQuantArray.fat.toString());
+      formData.append("sugar", exportedIngAndQuantArray.sugar.toString());
+      formData.append("salt", exportedIngAndQuantArray.salt.toString());
+      formData.append(
+        "saturatedFat",
+        exportedIngAndQuantArray.saturatedFat.toString()
+      );
+      formData.append("fiber", exportedIngAndQuantArray.fiber.toString());
+      formData.append("steps", JSON.stringify(steps));
+      formData.append(
+        "ingAndQuants",
+        JSON.stringify(exportedIngAndQuantArray.ingAndQuant)
+      );
+      formData.append(
+        "nOfIngredients",
+        exportedIngAndQuantArray.ingAndQuant.length.toString()
+      );
 
-
-      
+      try {
+        if (originalRecipe?.recipeId) {
+          await axios.patch(
+            `/api/recipe/${originalRecipe.recipeId}}`,
+            formData,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+              data: formData,
+            }
+          );
+        } else {
+          await axios.post(`/api/recipe`, formData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+            data: formData,
+          });
+        }
+      } catch (error) {
+        toast.error("Something went wrong, please try again later", {
+          id: "profileUpdateError",
+        });
+        setIsLoading(false);
+      }
+      toast.success("Recipe uploaded succesfully", {id: "successUpload"});
+      const recipeId = originalRecipe?.recipeId || uuid4;
+      router.push(`/recipe/${recipeId}`);
+    } else {
+      toast.error("Please add at least one ingredient to the recipe", {
+        id: "missingIngredients",
+      });
     }
   };
 
@@ -376,11 +359,11 @@ CreateRecipeFormProps) => {
           className="flex flex-row gap-2"
           onClick={handleSubmit}
         >
-          {isLoading ? 
-          <Loader2Icon className="animate-spin w-4 h-4" />
-          :
-          <RocketIcon className="w-4 h-4" />
-          }
+          {isLoading ? (
+            <Loader2Icon className="animate-spin w-4 h-4" />
+          ) : (
+            <RocketIcon className="w-4 h-4" />
+          )}
           Submit
         </Button>
       </div>
@@ -438,31 +421,31 @@ CreateRecipeFormProps) => {
                   <TimerIcon className="w-5 h-5" />
                   <p className="mr-2   text-lg font-semibold">Time:</p>
                   <Select
-                  disabled={isLoading}
-                  defaultValue={time}
-                  onValueChange={(value) => {
-                    handleChange("time", null, value);
-                  }}
+                    disabled={isLoading}
+                    defaultValue={time}
+                    onValueChange={(value) => {
+                      handleChange("time", null, value);
+                    }}
                   >
-      <SelectTrigger className="w-[240px] border-border border-2 border-dashed">
-        <SelectValue placeholder="Select a cooking time" />
-      </SelectTrigger>
-      <SelectContent className="h-64 border-primary">
-      <SelectItem value="5 min">5 min</SelectItem>
-      <SelectItem value="10 min">10 min</SelectItem>
-      <SelectItem value="15 min">15 min</SelectItem>
-      <SelectItem value="20 min">20 min</SelectItem>
-      <SelectItem value="30 min">30 min</SelectItem>
-      <SelectItem value="45 min">45 min</SelectItem>
-      <SelectItem value="1 h">1 h</SelectItem>
-      <SelectItem value="1 h 15 min">1 h 15 min</SelectItem>
-      <SelectItem value="1 h 30 min">1 h 30 min</SelectItem>
-      <SelectItem value="1 h 45 min">1 h 45 min</SelectItem>
-      <SelectItem value="2 h">2 h</SelectItem>
-      <SelectItem value="2 h 15 min">2 h 15 min</SelectItem>
-      <SelectItem value="2 h 30 min">2 h 30 min</SelectItem>
-      </SelectContent>
-      </Select>
+                    <SelectTrigger className="w-[240px] border-border border-2 border-dashed">
+                      <SelectValue placeholder="Select a cooking time" />
+                    </SelectTrigger>
+                    <SelectContent className="h-64 border-primary">
+                      <SelectItem value="5 min">5 min</SelectItem>
+                      <SelectItem value="10 min">10 min</SelectItem>
+                      <SelectItem value="15 min">15 min</SelectItem>
+                      <SelectItem value="20 min">20 min</SelectItem>
+                      <SelectItem value="30 min">30 min</SelectItem>
+                      <SelectItem value="45 min">45 min</SelectItem>
+                      <SelectItem value="1 h">1 h</SelectItem>
+                      <SelectItem value="1 h 15 min">1 h 15 min</SelectItem>
+                      <SelectItem value="1 h 30 min">1 h 30 min</SelectItem>
+                      <SelectItem value="1 h 45 min">1 h 45 min</SelectItem>
+                      <SelectItem value="2 h">2 h</SelectItem>
+                      <SelectItem value="2 h 15 min">2 h 15 min</SelectItem>
+                      <SelectItem value="2 h 30 min">2 h 30 min</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <p className="text-[red]">{validatedTime}</p>
               </div>
