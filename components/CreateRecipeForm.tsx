@@ -284,6 +284,7 @@ CreateRecipeFormProps) => {
         formData.append("imagePath", "");
       }
       if (newImage) {
+        
         formData.append("imageFile", newImage);
       }
       formData.append("kcals", exportedIngAndQuantArray.kcals.toString());
@@ -332,6 +333,7 @@ CreateRecipeFormProps) => {
           id: "profileUpdateError",
         });
         setIsLoading(false);
+        return null;
       }
       toast.success("Recipe uploaded succesfully", {id: "successUpload"});
       const recipeId = originalRecipe?.recipeId || uuid4;

@@ -29,7 +29,7 @@ const page = async ({searchParams}: RootPageProps) => {
     <div className='flex flex-col gap-2 h-full'>
         <Searchbar emptyPlaceholder= 'Search for recipes by name or author'/>
         <CategoriesSlider data = {categories}/>
-        <PageContent recipes = {recipes}/>
+        <PageContent recipes = {recipes} displayAuthor = {true}/>
     </div>
   )
 }

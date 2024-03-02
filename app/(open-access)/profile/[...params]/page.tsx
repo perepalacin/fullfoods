@@ -1,6 +1,6 @@
 import { readUserSession } from "@/actions/auth/actions";
 import { getUserProfileByUsername, useLoadProfilePicture } from "@/actions/profile/get/actions";
-import { getRecipeByUserId } from "@/actions/recipes/get/actions";
+import { getRecipeByUserId, getSavedRecipes } from "@/actions/recipes/get/actions";
 import CenteredWidthWrapper from "@/components/BackgroundAndMargins/CenteredWidthWrapper";
 import ExploreRecipesContent from "@/components/ExploreRecipesContent";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,12 @@ interface ProfilePageProps {
   }
     // author_username: string;
     // content: string;
+}
+
+interface PlaceholderRecipeProps {
+  recipes: {
+    data: RecipeItemProps
+  }
 }
 
 const profilePage = async ({ params }: ProfilePageProps) => {
@@ -51,11 +57,17 @@ const profilePage = async ({ params }: ProfilePageProps) => {
   const {data} = await readUserSession();
   if (!data.session) {
     return redirect("/");
-  } else {
-    console.log(data.session.user.id);
   }
 
-  const recipes: RecipeItemProps[] = await getRecipeByUserId(profileDetails.user_id);
+  var recipes: RecipeItemProps[] = [];
+  if (params.params[1] === "posts") {
+    recipes = await getRecipeByUserId(profileDetails.user_id);
+  } else if (params.params[1] === "saved") {
+    const placeholderRecipes = await getSavedRecipes(profileDetails.user_id);
+    recipes = placeholderRecipes.map((item:PlaceholderRecipeProps) => item.recipes);
+    console.log(recipes);
+  }
+  const posts = recipes.length;
   let imagePath: string | undefined;
   if (profileDetails.profile_picture) {
     imagePath = await useLoadProfilePicture(profileDetails.profile_picture);
@@ -97,7 +109,7 @@ const profilePage = async ({ params }: ProfilePageProps) => {
               <p className="text-muted-foreground">Followers</p>
             </div>
             <div className="flex flex-row gap-1 items-center">
-              <p>12</p>
+              <p>{posts}</p>
               <p className="text-muted-foreground">Recipes</p>
             </div>
           </div>
@@ -137,7 +149,7 @@ const profilePage = async ({ params }: ProfilePageProps) => {
       </div>
       </CenteredWidthWrapper>
       {/* TODO: Explore recipes gives me a hydration error I don't know why! */}
-      <ExploreRecipesContent recipes={recipes}/>
+      <ExploreRecipesContent recipes={recipes} displayAuthor={false}/>
     </div>
   );
 };

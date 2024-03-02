@@ -297,7 +297,6 @@ export type Database = {
       }
       recipes: {
         Row: {
-          author_username: string
           briefDescription: string | null
           carbs: number
           createdAt: string
@@ -320,7 +319,6 @@ export type Database = {
           user_id: string
         }
         Insert: {
-          author_username: string
           briefDescription?: string | null
           carbs: number
           createdAt?: string
@@ -343,7 +341,6 @@ export type Database = {
           user_id?: string
         }
         Update: {
-          author_username?: string
           briefDescription?: string | null
           carbs?: number
           createdAt?: string
@@ -365,7 +362,38 @@ export type Database = {
           updatedAt?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "public_recipes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["user_id"]
+          }
+        ]
+      }
+      saved_recipes: {
+        Row: {
+          recipeId: string
+          user_id: string
+        }
+        Insert: {
+          recipeId?: string
+          user_id?: string
+        }
+        Update: {
+          recipeId?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_saved_recipes_recipeId_fkey"
+            columns: ["recipeId"]
+            isOneToOne: false
+            referencedRelation: "recipes"
+            referencedColumns: ["recipeId"]
+          }
+        ]
       }
       subscriptions: {
         Row: {
@@ -445,7 +473,7 @@ export type Database = {
           phone: string | null
           profile_picture: string | null
           user_id: string
-          username: string | null
+          username: string
           webpage: string | null
           youtube: string | null
         }
@@ -457,7 +485,7 @@ export type Database = {
           phone?: string | null
           profile_picture?: string | null
           user_id?: string
-          username?: string | null
+          username: string
           webpage?: string | null
           youtube?: string | null
         }
@@ -469,7 +497,7 @@ export type Database = {
           phone?: string | null
           profile_picture?: string | null
           user_id?: string
-          username?: string | null
+          username?: string
           webpage?: string | null
           youtube?: string | null
         }

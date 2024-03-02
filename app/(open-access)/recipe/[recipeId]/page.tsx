@@ -43,10 +43,10 @@ const page = async ({ params }: RecipePageProps) => {
           <p className="italic w-full  text-left md:text-center text-muted-foreground">
             by:{" "}
             <Link 
-            href = {`/profile/${recipe.author_username}/posts`} 
+            href = {`/profile/${recipe.user_profiles.username}/posts`} 
             className="text-foreground font-semibold cursor-pointer hover:underline"
             >
-              @{recipe.author_username}
+              @{recipe.user_profiles.username}
             </Link>
           </p>
           {/* TODO: Convert this into the save row! */}

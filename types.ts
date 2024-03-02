@@ -68,8 +68,10 @@ export interface RecipeItemProps {
     recipeName: string;
     savedTimes: number | null;
     time: string;
-    author_username: string | null;
-    user_id: string;
+    user_profiles: {
+        user_id: string,
+        username: string,
+    }
 }
 
 export interface Recipes {
@@ -92,7 +94,10 @@ export interface Recipes {
     sugar: number;
     time: string;
     updatedAt: string | null;
-    author_username: string | null;
+    user_profiles: {
+        user_id: string,
+        username: string,
+    }
 }
 
 export interface Ingredients {

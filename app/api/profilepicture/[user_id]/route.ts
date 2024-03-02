@@ -26,6 +26,7 @@ export async function PATCH(
       if (!avatarFile) {
         return new NextResponse("Missing required fields", { status: 400 });
       };
+      
       const supabase = await createSupabaseServerClient();
 
       const { data, error } = await supabase
@@ -35,7 +36,6 @@ export async function PATCH(
         cacheControl: '5',
         upsert: true
       });
-      console.log("Hello");
       
     return NextResponse.json("Profile Updated Succesfully");
     } catch (error) {

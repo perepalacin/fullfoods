@@ -6,17 +6,20 @@ import Link from "next/link";
 import React, { Suspense } from "react";
 import { RecipeCardImageSkeleton } from "./skeletos";
 import { Skeleton } from "./ui/skeleton";
+import SaveButton from "./SaveButton";
 
 interface RecipeItemComponentProps {
   recipe: RecipeItemProps;
+  displayAuthor: boolean
 }
 
-const RecipeItem = async ({ recipe }: RecipeItemComponentProps) => {
+const RecipeItem = async ({ recipe, displayAuthor }: RecipeItemComponentProps) => {
   let imagePath: string | undefined;
   if (recipe.image) {
     imagePath = await useLoadFoodImage(recipe.image);
   }
 
+  console.log(recipe);
   return (
     //TODO: Change the format of the card if there is no image associated to the dish
     <div className="relative" key={recipe.recipeId}>
@@ -56,7 +59,12 @@ const RecipeItem = async ({ recipe }: RecipeItemComponentProps) => {
             <p className="text-sm md:text-base text-muted-foreground">
               {recipe.briefDescription}
             </p>
-            <hr className="border-0 bg-border h-px w-full mb-1" />
+            {displayAuthor ?
+              <hr className="border-0 bg-border h-px w-full mb-1"/>
+            :
+              <></>
+            }
+            {displayAuthor ? 
             <div className="flex flex-row justify-between items-center">
               {/* This may turn into a rating system */}
               <div className="flex flex-row items-center gap-1">
@@ -65,21 +73,23 @@ const RecipeItem = async ({ recipe }: RecipeItemComponentProps) => {
               </div>
               {/* turn this into an Linkt to navigate to the user page! */}
               <Link
-              href = {`/profile/${recipe.author_username}/posts`} 
+              href = {`/profile/${recipe.user_profiles.username}/posts`} 
               className="flex flex-row items-center gap-1 hover:underline cursor-pointer">
                 <CircleUserIcon className="w-4 h-4" />
                 {/* TODO: */}
-                <p className="italic">@{recipe.author_username}</p>
+                <p className="italic">@{recipe.user_profiles.username}</p>
               </Link>
             </div>
+              :
+              <></>
+              }
           </div>
         </div>
       </Link>
+      
       {/* TODO: SAVE Button only for AUth users! */}
       <div className="opacity-0 drop-shadow-md absolute right-2 top-2 flex flex-row gap-1.5 transition translate translate-x-1/4 peer-hover:opacity-100 peer-hover:translate-x-0 hover:opacity-100 hover:translate-x-0">
-        <button className="py-1.5 px-1.5 rounded-sm bg-secondary/50 backdrop-blur-md hover:bg-secondary transition-colors duration-200">
-          <BookmarkIcon />
-        </button>
+        <SaveButton recipeId={recipe.recipeId} />
       </div>
     </div>
   );

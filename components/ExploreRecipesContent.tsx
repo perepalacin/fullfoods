@@ -25,9 +25,10 @@ import RecipeItem from "./RecipeItem";
 
 interface recipesProps {
   recipes: RecipeItemProps[];
+  displayAuthor: boolean
 }
 
-const ExploreRecipesContent = ({ recipes }: recipesProps) => {
+const ExploreRecipesContent = ({ recipes, displayAuthor }: recipesProps) => {
 
     if (recipes.length === 0) {
         return (
@@ -35,11 +36,11 @@ const ExploreRecipesContent = ({ recipes }: recipesProps) => {
         )
     }
 
-  //TODO: Add a return if the lenght of recipes is 0 saying somehting like: Sorry we couldnt find what you wew looking for
+    //TODO: Add a return if the lenght of recipes is 0 saying somehting like: Sorry we couldnt find what you wew looking for
   return (
     <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 xl:colums-5 2xl:colums-6 gap-4 h-full">
       {recipes.map((item) => (
-        <RecipeItem recipe={item} key={item.recipeId}/>
+        <RecipeItem recipe={item} key={item.recipeId} displayAuthor={displayAuthor}/>
       ))}
     </div>
   );
