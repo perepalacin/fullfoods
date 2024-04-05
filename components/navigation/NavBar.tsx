@@ -1,4 +1,4 @@
-import { BananaIcon, SearchIcon } from 'lucide-react'
+import { BananaIcon, PlusIcon, SearchIcon, SettingsIcon } from 'lucide-react'
 import React from 'react'
 import { ThemeSwitch } from '@/components/BackgroundAndMargins/ModeSwitch'
 import Link from 'next/link'
@@ -91,11 +91,22 @@ const NavBar = async () => {
                         </DropdownMenuItem>
                         <DropdownMenuSeparator/>
                         <DropdownMenuItem>
-                            {/* <SignInButton onClick = {() => {handleSignIn}}/> */}
+                        <Link
+                            href={"/recipe/create/new"}>
+                                <Button variant={"ghost"} className='flex flex-row  items-start justify-start gap-1'>
+                                    <PlusIcon className='w-5 h-5'/>
+                                    Create Recipe
+                                </Button>
+                            </Link>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator/>
                         <DropdownMenuItem>
-                            {/* <UpgradeButton/> */}
+                        <Link
+                            href={"/setup/profile"}>
+                                <Button variant={"ghost"} className='flex flex-row  items-start justify-start gap-1'>
+                                    <SettingsIcon className='w-5 h-5'/>
+                                    Settings                                </Button>
+                            </Link>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator/>
                         <DropdownMenuItem>
