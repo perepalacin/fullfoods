@@ -71,8 +71,9 @@ export async function POST(
             fiber: fiber,
             steps: steps,
             nOfIngredients: nOfIngredients,
-            author_username: profileDetails.username,
-          });      
+          }); 
+          
+    console.log(recipeError);
 
     for (let i = 0; i < ingAndQuants.length; i++) {
         const {error} = await supabase.from("ingredientsToRecipes").insert({
@@ -80,10 +81,11 @@ export async function POST(
             ingredientId: ingAndQuants[i][0],
             quantity: ingAndQuants[i][1],
         });
-    }
-    return NextResponse.json("Profile Updated Succesfully");
+        console.log(error)
+      }
+    return NextResponse.json("Recipe Uploaded Succesfully");
     } catch (error) {
-      console.log("User Profile Update Error", error);
+      console.log("Recipe upload Error", error);
       return new NextResponse("Internal Error", { status: 500 });
     }
   };

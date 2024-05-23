@@ -33,6 +33,8 @@ const page = async ({ params }: RecipePageProps) => {
     );
   }
 
+  console.log(recipe);
+
   return (
     <div className="flex flex-col gap-4 pb-20">
       <div className="w-full flex flex-col md:flex-row gap-1 md:gap-4">
@@ -43,7 +45,7 @@ const page = async ({ params }: RecipePageProps) => {
           <p className="italic w-full  text-left md:text-center text-muted-foreground">
             by:{" "}
             <Link 
-            href = {`/profile/${recipe.user_profiles.username}/posts`} 
+            href = {`/profile/${recipe.user_profiles.username}/posts` || "/"} 
             className="text-foreground font-semibold cursor-pointer hover:underline"
             >
               @{recipe.user_profiles.username}

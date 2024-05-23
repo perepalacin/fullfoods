@@ -22,7 +22,6 @@ const DrawerAddElement: React.FC<DrawerAddElementProps> = ({
   isReplace,
   addSwitchNewIngredient,
   indexToReplace,
-  ingredientToReplace,
 }) => {
   //State that holds the result of the db query
   const [ingredientsQueryResult, setIngredientsQueryResult] =
